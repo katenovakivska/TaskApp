@@ -1,0 +1,19 @@
+@TaskApp_HostAddress = https://localhost:7206
+
+GET {{TaskApp_HostAddress}}/tasklists/getList/{listId}?userId=guid-value
+Accept: application/json
+
+POST {{TaskApp_HostAddress}}/tasklists?userId=guid-value
+Accept: application/json
+
+PUT {{TaskApp_HostAddress}}/tasklists/{listId}?userId=guid-value
+Accept: application/json
+
+DELETE {{TaskApp_HostAddress}}/tasklists/{listId}?userId=guid-value
+
+POST {{TaskApp_HostAddress}}/tasklists/{listId}/access?userId=guid-value
+Accept: application/json
+
+GET {{TaskApp_HostAddress}}/tasklists/{listId}/access/{sharedUserId}?userId=guid-value
+
+###
