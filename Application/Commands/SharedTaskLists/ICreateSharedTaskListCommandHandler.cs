@@ -4,6 +4,6 @@ namespace Application.Commands.SharedTaskLists
 {
     public interface ICreateSharedTaskListCommandHandler
     {
-        Task<SharedTaskList?> HandleAsync(CreateSharedTaskListCommand command);
+        Task<(SharedTaskList? access, bool isListFound, bool isAccessCreated)> HandleAsync(CreateSharedTaskListCommand command);
     }
 }

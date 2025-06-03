@@ -1,4 +1,5 @@
 ﻿using Application.Commands.TaskLists;
+using Application.Queries.TaskLists;
 using AutoMapper;
 using WebApi.Requests;
 
@@ -9,6 +10,7 @@ namespace WebApi.Mapping
         public MappingProfile()
         {
             CreateMap<CreateTaskListRequest, CreateTaskListCommand>();
+            CreateMap<GetAllTaskListsRequest, GetAllTaskListsByUserIdQuery>();
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Domain.Entities;
+﻿using Domain.DTO;
+using Domain.Entities;
 
 namespace Domain.Interfaces
 {
@@ -6,7 +7,7 @@ namespace Domain.Interfaces
     {
         Task<TaskList?> GetByListIdAndUserIdAsync(Guid userId, Guid listId);
         Task<TaskList?> GetByListIdAndOwnerIdAsync(Guid userId, Guid listId);
-        Task<IEnumerable<TaskList>> GetAllAsync();
+        Task<IEnumerable<TaskListDto>> GetAllByUserIdAsync(Guid userId, int pageNumber, int pageSize);
         Task AddAsync(TaskList taskList);
         void Update(TaskList taskList);
         void Delete(Guid listId, Guid userId);

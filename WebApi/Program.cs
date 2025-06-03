@@ -23,6 +23,8 @@ builder.Services.AddScoped<ICreateSharedTaskListCommandHandler, CreateSharedTask
 builder.Services.AddScoped<IDeleteTaskListCommandHandler, DeleteTaskListCommandHandler>();
 builder.Services.AddScoped<IUpdateTaskListCommandHandler, UpdateTaskListCommandHandler>();
 builder.Services.AddScoped<IGetAllAccessByTaskListIdQueryHandler, GetAllAccessByTaskListIdQueryHandler>();
+builder.Services.AddScoped<IDeleteSharedTaskListCommandHandler, DeleteSharedTaskListCommandHandler>();
+builder.Services.AddScoped<IGetAllTaskListsByUserIdQueryHandler, GetAllTaskListsByUserIdQueryHandler>();
 
 builder.Services.AddAutoMapper(typeof(Program));
 

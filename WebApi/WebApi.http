@@ -1,6 +1,9 @@
 @TaskApp_HostAddress = https://localhost:7206
 
-GET {{TaskApp_HostAddress}}/tasklists/getList/{listId}?userId=guid-value
+GET {{TaskApp_HostAddress}}/tasklists/{listId}?userId=guid-value
+Accept: application/json
+
+GET {{TaskApp_HostAddress}}/tasklists/?userId=guid-value&pageNumber=1&pageSize=5
 Accept: application/json
 
 POST {{TaskApp_HostAddress}}/tasklists?userId=guid-value

@@ -4,6 +4,7 @@ using Application.Commands.TaskLists;
 using Application.Queries.TaskLists;
 using AutoMapper;
 using WebApi.Requests;
+using Domain.DTO;
 
 namespace WebApi.Controllers
 {
@@ -16,17 +17,20 @@ namespace WebApi.Controllers
         private readonly IGetTaskListByIdAndUserIdQueryHandler _getTaskListByIdAndUserIdQueryHandler;
         private readonly IDeleteTaskListCommandHandler _deleteTaskListCommandHandler;
         private readonly IUpdateTaskListCommandHandler _updateTaskListCommandHandler;
+        private readonly IGetAllTaskListsByUserIdQueryHandler _getAllTaskListsByUserIdQueryHandler;
         public TaskListsController(IMapper mapper,
                                    ICreateTaskListCommandHandler createHandler,
                                    IGetTaskListByIdAndUserIdQueryHandler getTaskListByIdAndUserIdQueryHandler,
                                    IDeleteTaskListCommandHandler deleteTaskListCommandHandler,
-                                   IUpdateTaskListCommandHandler updateTaskListCommandHandler)
+                                   IUpdateTaskListCommandHandler updateTaskListCommandHandler,
+                                   IGetAllTaskListsByUserIdQueryHandler getAllTaskListsByUserIdQueryHandler)
         {
             _mapper = mapper;
             _createHandler = createHandler;
             _getTaskListByIdAndUserIdQueryHandler = getTaskListByIdAndUserIdQueryHandler;
             _deleteTaskListCommandHandler = deleteTaskListCommandHandler;
             _updateTaskListCommandHandler = updateTaskListCommandHandler;
+            _getAllTaskListsByUserIdQueryHandler = getAllTaskListsByUserIdQueryHandler;
         }
 
         [HttpPost]
@@ -43,7 +47,7 @@ namespace WebApi.Controllers
             return Ok(taskList);
         }
 
-        [HttpGet("getList/{listId}")]
+        [HttpGet("{listId}")]
         public async Task<IActionResult> GetListByListId(Guid listId, [FromQuery] Guid userId)
         {
             var taskList = await _getTaskListByIdAndUserIdQueryHandler.HandleAsync(new GetTaskListByIdAndUserIdQuery() 
@@ -95,6 +99,21 @@ namespace WebApi.Controllers
                 return NotFound();
 
             return NoContent();
+        }
+
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<IEnumerable<TaskListDto>>> GetTaskLists([FromQuery] Guid userId, [FromQuery] GetAllTaskListsRequest request)
+        {
+            var query = _mapper.Map<GetAllTaskListsByUserIdQuery>(request);
+            query.UserId = userId;
+            
+            var taskLists = await _getAllTaskListsByUserIdQueryHandler.HandleAsync(query);
+
+            if (!taskLists.Any())
+                return NotFound();
+
+            return Ok(taskLists);
         }
     }
 }

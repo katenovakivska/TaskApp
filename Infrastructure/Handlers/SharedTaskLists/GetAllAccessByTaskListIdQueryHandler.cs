@@ -13,9 +13,14 @@ namespace Infrastructure.Handlers.SharedTaskLists
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<IEnumerable<SharedTaskList>> HandleAsync(Guid listId)
+        public async Task<(IEnumerable<SharedTaskList>?, bool isListFound)> HandleAsync(GetAllAccessByTaskListIdQuery query)
         {
-            return await _unitOfWork.SharedTaskLists.GetByTaskListIdAsync(listId);
+            var taskList = await _unitOfWork.TaskLists.GetByListIdAndUserIdAsync(query.UserId, query.ListId);
+
+            if (taskList == null)
+                return (null, false);
+
+            return (await _unitOfWork.SharedTaskLists.GetByTaskListIdAsync(taskList.Id), true);
         }
     }
 }

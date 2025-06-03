@@ -1,6 +1,5 @@
 ﻿using Application.Commands.SharedTaskLists;
 using Application.Queries.SharedTaskLists;
-using Application.Queries.TaskLists;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers
@@ -9,17 +8,14 @@ namespace WebApi.Controllers
     [Route("api/tasklists/{listId}/access")]
     public class TaskListAccessController : Controller
     {
-        private readonly IGetTaskListByIdAndUserIdQueryHandler _getTaskListByIdAndUserIdQueryHandler;
         private readonly ICreateSharedTaskListCommandHandler _createSharedTaskListCommandHandler;
         private readonly IGetAllAccessByTaskListIdQueryHandler _getAllAccessByTaskListIdQueryHandler;
         private readonly IDeleteSharedTaskListCommandHandler _deleteSharedTaskListCommandHandler;
 
-        public TaskListAccessController(IGetTaskListByIdAndUserIdQueryHandler getTaskListByIdAndUserIdQueryHandler,
-            ICreateSharedTaskListCommandHandler createSharedTaskListCommandHandler,
+        public TaskListAccessController(ICreateSharedTaskListCommandHandler createSharedTaskListCommandHandler,
             IGetAllAccessByTaskListIdQueryHandler getAllAccessByTaskListIdQueryHandler,
             IDeleteSharedTaskListCommandHandler deleteSharedTaskListCommandHandler)
         {
-            _getTaskListByIdAndUserIdQueryHandler = getTaskListByIdAndUserIdQueryHandler;
             _createSharedTaskListCommandHandler = createSharedTaskListCommandHandler;
             _getAllAccessByTaskListIdQueryHandler = getAllAccessByTaskListIdQueryHandler;
             _deleteSharedTaskListCommandHandler = deleteSharedTaskListCommandHandler;
@@ -30,23 +26,18 @@ namespace WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         public async Task<IActionResult> ShareListWithUser(Guid listId, [FromQuery] Guid userId, [FromBody] Guid sharedUserId)
         {
-            var taskList = await _getTaskListByIdAndUserIdQueryHandler.HandleAsync(new GetTaskListByIdAndUserIdQuery()
+            (var access, var isListFound, var isAccessCreated) = await _createSharedTaskListCommandHandler.HandleAsync(new CreateSharedTaskListCommand()
             {
                 UserId = userId,
-                ListId = listId
+                ListId = listId,
+                SharedUserId = sharedUserId
             });
 
-            if (taskList == null)
+            if (!isListFound)
                 return NotFound();
             else
             {
-                var access = await _createSharedTaskListCommandHandler.HandleAsync(new CreateSharedTaskListCommand()
-                {
-                    UserId = sharedUserId,
-                    ListId = listId
-                });
-
-                if (access == null) 
+                if (!isAccessCreated) 
                     return Conflict();
                 else
                     return Ok(access);
@@ -57,18 +48,16 @@ namespace WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetAccessListByListId(Guid listId, [FromQuery] Guid userId)
         {
-            var taskList = await _getTaskListByIdAndUserIdQueryHandler.HandleAsync(new GetTaskListByIdAndUserIdQuery()
-            {
+            (var access, var isListFound) = await _getAllAccessByTaskListIdQueryHandler.HandleAsync(new GetAllAccessByTaskListIdQuery()
+            { 
                 UserId = userId,
                 ListId = listId
             });
-            if (taskList == null)
+
+            if (!isListFound)
                 return NotFound();
             else
-            {
-                var access = await _getAllAccessByTaskListIdQueryHandler.HandleAsync(listId);
                 return Ok(access);
-            }
         }
 
         [HttpDelete("{sharedUserId}")]

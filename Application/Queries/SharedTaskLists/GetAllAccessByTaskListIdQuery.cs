@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Application.Queries.SharedTaskLists
+﻿namespace Application.Queries.SharedTaskLists
 {
-    internal class GetAllAccessByTaskListIdQuery
+    public class GetAllAccessByTaskListIdQuery
     {
+        public Guid ListId { get; set; }
+        public Guid UserId { get; set; }
     }
 }
