@@ -1,12 +1,10 @@
 ﻿using Application.Commands.TaskLists;
-using Application.Queries.TaskLists;
-using Domain.Entities;
+using Application.Common.Interfaces;
 using Domain.Interfaces;
-using System.Collections.Generic;
 
 namespace Infrastructure.Handlers.TaskLists
 {
-    public class UpdateTaskListCommandHandler: IUpdateTaskListCommandHandler
+    public class UpdateTaskListCommandHandler: ICommandHandler<UpdateTaskListCommand, bool>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -15,7 +13,7 @@ namespace Infrastructure.Handlers.TaskLists
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<bool> HandleAsync(UpdateTaskListCommand command)
+        public async Task<bool> Handle(UpdateTaskListCommand command)
         {
             var taskList = await _unitOfWork.TaskLists.GetByListIdAndUserIdAsync(command.UserId, command.ListId);
             

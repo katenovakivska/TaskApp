@@ -1,13 +1,11 @@
 ﻿using Application.Commands.SharedTaskLists;
-using Application.Queries.SharedTaskLists;
-using Application.Queries.TaskLists;
+using Application.Common.Interfaces;
 using Domain.Entities;
 using Domain.Interfaces;
-using System.Collections.Generic;
 
 namespace Infrastructure.Handlers.SharedTaskLists
 {
-    public class CreateSharedTaskListCommandHandler: ICreateSharedTaskListCommandHandler
+    public class CreateSharedTaskListCommandHandler: ICommandHandler<CreateSharedTaskListCommand, (SharedTaskList? access, bool isListFound, bool isAccessCreated)>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -16,7 +14,7 @@ namespace Infrastructure.Handlers.SharedTaskLists
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<(SharedTaskList? access, bool isListFound, bool isAccessCreated)> HandleAsync(CreateSharedTaskListCommand command)
+        public async Task<(SharedTaskList? access, bool isListFound, bool isAccessCreated)> Handle(CreateSharedTaskListCommand command)
         {
             var taskList = await _unitOfWork.TaskLists.GetByListIdAndUserIdAsync(command.UserId, command.ListId);
 

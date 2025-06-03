@@ -19,11 +19,6 @@ namespace Infrastructure.Repositories
             return await _context.TaskItems.Where(t => t.TaskListId == taskListId).ToListAsync();
         }
 
-        public async Task<TaskItem?> GetByTaskIdAsync(Guid taskId)
-        {
-            return await _context.TaskItems.FirstOrDefaultAsync(t => t.Id == taskId);
-        }
-
         public async Task AddAsync(IEnumerable<TaskItem> taskItems)
         {
             await _context.TaskItems.AddRangeAsync(taskItems);

@@ -10,7 +10,7 @@ namespace WebApi.Mapping
         public MappingProfile()
         {
             CreateMap<CreateTaskListRequest, CreateTaskListCommand>();
-            CreateMap<GetAllTaskListsRequest, GetAllTaskListsByUserIdQuery>();
+            CreateMap<GetAllTaskListsRequest, GetAllTaskListsByUserIdWithPaginationQuery>();
         }
     }
 }

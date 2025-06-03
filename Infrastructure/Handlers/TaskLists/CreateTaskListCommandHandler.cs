@@ -1,10 +1,11 @@
 ﻿using Application.Commands.TaskLists;
+using Application.Common.Interfaces;
 using Domain.Entities;
 using Domain.Interfaces;
 
 namespace Infrastructure.Handlers.TaskLists
 {
-    public class CreateTaskListCommandHandler: ICreateTaskListCommandHandler
+    public class CreateTaskListCommandHandler: ICommandHandler<CreateTaskListCommand, TaskList?>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -13,7 +14,7 @@ namespace Infrastructure.Handlers.TaskLists
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<TaskList?> HandleAsync(CreateTaskListCommand command)
+        public async Task<TaskList?> Handle(CreateTaskListCommand command)
         {
             var taskList = new TaskList
             {

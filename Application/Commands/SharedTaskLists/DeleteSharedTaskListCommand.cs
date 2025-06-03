@@ -1,6 +1,8 @@
-﻿namespace Application.Commands.SharedTaskLists
+﻿using Application.Common.Interfaces;
+
+namespace Application.Commands.SharedTaskLists
 {
-    public class DeleteSharedTaskListCommand
+    public class DeleteSharedTaskListCommand: ICommand<bool>
     {
         public Guid ListId { get; set; }
         public Guid OwnerId { get; set; }

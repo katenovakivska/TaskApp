@@ -1,10 +1,11 @@
-﻿using Application.Queries.SharedTaskLists;
+﻿using Application.Common.Interfaces;
+using Application.Queries.SharedTaskLists;
 using Domain.Entities;
 using Domain.Interfaces;
 
 namespace Infrastructure.Handlers.SharedTaskLists
 {
-    public class GetAllAccessByTaskListIdQueryHandler: IGetAllAccessByTaskListIdQueryHandler
+    public class GetAllAccessByTaskListIdQueryHandler: IQueryHandler<GetAllAccessByTaskListIdQuery, (IEnumerable<SharedTaskList>?, bool isListFound)>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -13,7 +14,7 @@ namespace Infrastructure.Handlers.SharedTaskLists
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<(IEnumerable<SharedTaskList>?, bool isListFound)> HandleAsync(GetAllAccessByTaskListIdQuery query)
+        public async Task<(IEnumerable<SharedTaskList>?, bool isListFound)> Handle(GetAllAccessByTaskListIdQuery query)
         {
             var taskList = await _unitOfWork.TaskLists.GetByListIdAndUserIdAsync(query.UserId, query.ListId);
 

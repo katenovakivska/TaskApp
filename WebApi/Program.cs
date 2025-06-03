@@ -8,7 +8,10 @@ using Application.Commands.SharedTaskLists;
 using Application.Queries.SharedTaskLists;
 using Infrastructure.Handlers.SharedTaskLists;
 using Infrastructure.Handlers.TaskLists;
+using Application.Common.Dispatchers;
+using Application.Common.Interfaces;
 using Domain.Entities;
+using Domain.DTO;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,14 +20,15 @@ builder.Services.AddScoped<ITaskListRepository, TaskListRepository>();
 builder.Services.AddScoped<ITaskItemRepository, TaskItemRepository>();
 builder.Services.AddScoped<ISharedTaskListRepository, SharedTaskListRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddScoped<ICreateTaskListCommandHandler, CreateTaskListCommandHandler>();
-builder.Services.AddScoped<IGetTaskListByIdAndUserIdQueryHandler, GetTaskListByIdAndUserIdQueryHandler>();
-builder.Services.AddScoped<ICreateSharedTaskListCommandHandler, CreateSharedTaskListCommandHandler>();
-builder.Services.AddScoped<IDeleteTaskListCommandHandler, DeleteTaskListCommandHandler>();
-builder.Services.AddScoped<IUpdateTaskListCommandHandler, UpdateTaskListCommandHandler>();
-builder.Services.AddScoped<IGetAllAccessByTaskListIdQueryHandler, GetAllAccessByTaskListIdQueryHandler>();
-builder.Services.AddScoped<IDeleteSharedTaskListCommandHandler, DeleteSharedTaskListCommandHandler>();
-builder.Services.AddScoped<IGetAllTaskListsByUserIdQueryHandler, GetAllTaskListsByUserIdQueryHandler>();
+builder.Services.AddScoped<IDispatcher, Dispatcher>();
+builder.Services.AddScoped<ICommandHandler<CreateTaskListCommand, TaskList?>, CreateTaskListCommandHandler>();
+builder.Services.AddScoped<ICommandHandler<UpdateTaskListCommand, bool>, UpdateTaskListCommandHandler>();
+builder.Services.AddScoped<ICommandHandler<DeleteTaskListCommand, bool>, DeleteTaskListCommandHandler>();
+builder.Services.AddScoped<IQueryHandler<GetAllTaskListsByUserIdWithPaginationQuery, IEnumerable<TaskListDto>>, GetAllTaskListsByUserIdWithPaginationQueryHandler>();
+builder.Services.AddScoped<IQueryHandler<GetTaskListByIdAndUserIdQuery, TaskList?>, GetTaskListByIdAndUserIdQueryHandler>();
+builder.Services.AddScoped<ICommandHandler<CreateSharedTaskListCommand, (SharedTaskList? access, bool isListFound, bool isAccessCreated)>, CreateSharedTaskListCommandHandler>();
+builder.Services.AddScoped<IQueryHandler<GetAllAccessByTaskListIdQuery, (IEnumerable<SharedTaskList>?, bool isListFound)>, GetAllAccessByTaskListIdQueryHandler>();
+builder.Services.AddScoped<ICommandHandler<DeleteSharedTaskListCommand, bool>, DeleteSharedTaskListCommandHandler>();
 
 builder.Services.AddAutoMapper(typeof(Program));
 

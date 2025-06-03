@@ -5,6 +5,8 @@ using Application.Queries.TaskLists;
 using AutoMapper;
 using WebApi.Requests;
 using Domain.DTO;
+using Application.Common.Dispatchers;
+using Domain.Entities;
 
 namespace WebApi.Controllers
 {
@@ -12,25 +14,14 @@ namespace WebApi.Controllers
     [Route("[controller]")]
     public class TaskListsController : Controller
     {
+        private readonly IDispatcher _dispatcher;
         private readonly IMapper _mapper;
-        private readonly ICreateTaskListCommandHandler _createHandler;
-        private readonly IGetTaskListByIdAndUserIdQueryHandler _getTaskListByIdAndUserIdQueryHandler;
-        private readonly IDeleteTaskListCommandHandler _deleteTaskListCommandHandler;
-        private readonly IUpdateTaskListCommandHandler _updateTaskListCommandHandler;
-        private readonly IGetAllTaskListsByUserIdQueryHandler _getAllTaskListsByUserIdQueryHandler;
-        public TaskListsController(IMapper mapper,
-                                   ICreateTaskListCommandHandler createHandler,
-                                   IGetTaskListByIdAndUserIdQueryHandler getTaskListByIdAndUserIdQueryHandler,
-                                   IDeleteTaskListCommandHandler deleteTaskListCommandHandler,
-                                   IUpdateTaskListCommandHandler updateTaskListCommandHandler,
-                                   IGetAllTaskListsByUserIdQueryHandler getAllTaskListsByUserIdQueryHandler)
+
+        public TaskListsController(IDispatcher dispatcher,
+                                   IMapper mapper)
         {
+            _dispatcher = dispatcher;
             _mapper = mapper;
-            _createHandler = createHandler;
-            _getTaskListByIdAndUserIdQueryHandler = getTaskListByIdAndUserIdQueryHandler;
-            _deleteTaskListCommandHandler = deleteTaskListCommandHandler;
-            _updateTaskListCommandHandler = updateTaskListCommandHandler;
-            _getAllTaskListsByUserIdQueryHandler = getAllTaskListsByUserIdQueryHandler;
         }
 
         [HttpPost]
@@ -43,14 +34,14 @@ namespace WebApi.Controllers
 
             CreateTaskListCommand command = _mapper.Map<CreateTaskListCommand>(request);
             command.OwnerId = userId;
-            var taskList = await _createHandler.HandleAsync(command);
+            var taskList = await _dispatcher.Send<CreateTaskListCommand, TaskList?>(command); ;
             return Ok(taskList);
         }
 
         [HttpGet("{listId}")]
         public async Task<IActionResult> GetListByListId(Guid listId, [FromQuery] Guid userId)
         {
-            var taskList = await _getTaskListByIdAndUserIdQueryHandler.HandleAsync(new GetTaskListByIdAndUserIdQuery() 
+            var taskList = await _dispatcher.Query<GetTaskListByIdAndUserIdQuery, TaskList?>(new GetTaskListByIdAndUserIdQuery() 
             { 
                 UserId = userId,
                 ListId = listId
@@ -67,7 +58,7 @@ namespace WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteTaskList(Guid listId, [FromQuery] Guid userId)
         {
-            var isDeleted = await _deleteTaskListCommandHandler.HandleAsync(new DeleteTaskListCommand()
+            var isDeleted = await _dispatcher.Send<DeleteTaskListCommand, bool>(new DeleteTaskListCommand()
             {
                 UserId = userId,
                 ListId = listId
@@ -88,7 +79,7 @@ namespace WebApi.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var isUpdated = await _updateTaskListCommandHandler.HandleAsync(new UpdateTaskListCommand()
+            var isUpdated = await _dispatcher.Send<UpdateTaskListCommand, bool>(new UpdateTaskListCommand()
             {
                 UserId = userId,
                 ListId = listId,
@@ -105,10 +96,10 @@ namespace WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IEnumerable<TaskListDto>>> GetTaskLists([FromQuery] Guid userId, [FromQuery] GetAllTaskListsRequest request)
         {
-            var query = _mapper.Map<GetAllTaskListsByUserIdQuery>(request);
+            var query = _mapper.Map<GetAllTaskListsByUserIdWithPaginationQuery>(request);
             query.UserId = userId;
             
-            var taskLists = await _getAllTaskListsByUserIdQueryHandler.HandleAsync(query);
+            var taskLists = await _dispatcher.Query<GetAllTaskListsByUserIdWithPaginationQuery, IEnumerable<TaskListDto>>(query);
 
             if (!taskLists.Any())
                 return NotFound();

@@ -1,9 +1,10 @@
 ﻿using Application.Commands.TaskLists;
+using Application.Common.Interfaces;
 using Domain.Interfaces;
 
 namespace Infrastructure.Handlers.TaskLists
 {
-    public class DeleteTaskListCommandHandler: IDeleteTaskListCommandHandler
+    public class DeleteTaskListCommandHandler: ICommandHandler<DeleteTaskListCommand, bool>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -12,7 +13,7 @@ namespace Infrastructure.Handlers.TaskLists
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<bool> HandleAsync(DeleteTaskListCommand command)
+        public async Task<bool> Handle(DeleteTaskListCommand command)
         {
             var taskList = await _unitOfWork.TaskLists.GetByListIdAndOwnerIdAsync(command.UserId, command.ListId);
 

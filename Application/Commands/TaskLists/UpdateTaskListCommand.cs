@@ -1,8 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Application.Common.Interfaces;
+using System.ComponentModel.DataAnnotations;
 
 namespace Application.Commands.TaskLists
 {
-    public class UpdateTaskListCommand
+    public class UpdateTaskListCommand: ICommand<bool>
     {
         public Guid ListId { get; set; }
         public Guid UserId { get; set; }

@@ -1,13 +1,10 @@
 ﻿using Application.Commands.SharedTaskLists;
-using Application.Queries.SharedTaskLists;
-using Application.Queries.TaskLists;
-using Domain.Entities;
+using Application.Common.Interfaces;
 using Domain.Interfaces;
-using System.Collections.Generic;
 
 namespace Infrastructure.Handlers.SharedTaskLists
 {
-    public class DeleteSharedTaskListCommandHandler: IDeleteSharedTaskListCommandHandler
+    public class DeleteSharedTaskListCommandHandler: ICommandHandler<DeleteSharedTaskListCommand, bool>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -16,7 +13,7 @@ namespace Infrastructure.Handlers.SharedTaskLists
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<bool> HandleAsync(DeleteSharedTaskListCommand command)
+        public async Task<bool> Handle(DeleteSharedTaskListCommand command)
         {
             var taskList = await _unitOfWork.TaskLists.GetByListIdAndUserIdAsync(command.OwnerId, command.ListId);
 
